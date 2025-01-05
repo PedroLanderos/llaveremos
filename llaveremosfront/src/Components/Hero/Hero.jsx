@@ -1,8 +1,8 @@
 import React from 'react'
 import './Hero.css'
-import handIcon from '../Assets/hand_icon.png'  
-import arroIcon from '../Assets/arrow.png'
-import heroImage from '../Assets/hero-removebg-preview.png'
+import handIcon from '../Assets/Images/hand_icon.png'  
+import arroIcon from '../Assets/Images/arrow.png'
+import heroImage from '../Assets/Images/hero-removebg-preview.png'
 
 const Hero = () => {
   return (
@@ -14,11 +14,11 @@ const Hero = () => {
             <p>Nuevos</p>
             <img src={handIcon} alt="" />
           </div>
-          <p>Disenos</p>
+          <p>Diseños</p>
           <p>De los mejores llaveros</p>
         </div>
         <div className="hero-latest-btn">
-          <div>Ultimos disenos</div>
+          <div>Ultimos diseños</div>
           <img src={arroIcon} alt="" />
         </div>
       </div>

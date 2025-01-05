@@ -1,10 +1,9 @@
 import React from 'react'
 import './Footer.css'
-import footer_logo from '../Assets/logo_big.png'
-import insta from '../Assets/instagram_icon.png'
-import whats from '../Assets/whatsapp_icon.png'
-import pinterest from '../Assets/pintester_icon.png'
-
+import footer_logo from '../Assets/Images/logo_big.png'
+import insta from '../Assets/Images/instagram_icon.png'
+import whats from '../Assets/Images/whatsapp_icon.png'
+import pinterest from '../Assets/Images/pintester_icon.png'
 
 const Footer = () => {
   return (
@@ -22,13 +21,19 @@ const Footer = () => {
       </ul>
       <div className="footer-social-icon">
         <div className="footer-icons-container">
-            <img src={insta} alt="" />
+          <a href="https://www.instagram.com/_alexito_gm_/" target="_blank" rel="noopener noreferrer">
+            <img src={insta} alt="Instagram" />
+          </a>
         </div>
         <div className="footer-icons-container">
-            <img src={whats} alt="" />
+          <a href="https://wa.me/" target="_blank" rel="noopener noreferrer">
+            <img src={whats} alt="WhatsApp" />
+          </a>
         </div>
         <div className="footer-icons-container">
-            <img src={pinterest} alt="" />
+          <a href="https://www.pinterest.com/" target="_blank" rel="noopener noreferrer">
+            <img src={pinterest} alt="Pinterest" />
+          </a>
         </div>
       </div>
       <div className="footer-copyright">
