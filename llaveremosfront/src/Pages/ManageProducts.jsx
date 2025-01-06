@@ -45,57 +45,53 @@ const ManageProducts = () => {
     setSelectedImage(e.target.files[0]); // Guardar la imagen seleccionada
   };
 
-  const saveImageToPublic = (image, id) => {
-    const newFileName = `product_${id}.png`;
-
-    // Crear un enlace para descargar la imagen en `public/assets/images`
-    const fileReader = new FileReader();
-    fileReader.onload = () => {
-      const blob = new Blob([fileReader.result], { type: image.type });
-      const url = URL.createObjectURL(blob);
-
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `public/assets/images/${newFileName}`;
-      a.click();
-      URL.revokeObjectURL(url);
-    };
-    fileReader.readAsArrayBuffer(image);
-  };
-
   const handleUpdateSubmit = async (e) => {
     e.preventDefault();
 
-    if (selectedImage) {
-      try {
-        saveImageToPublic(selectedImage, editingProduct.id); // Guardar la imagen en `public`
-        setMessage("Imagen guardada exitosamente.");
-      } catch (error) {
-        console.error("Error al guardar la imagen:", error);
-        setMessage("Error al guardar la imagen. Intenta de nuevo.");
-        return;
-      }
-    }
-
     try {
-      const response = await axios.put(
+      // Actualizar el producto en el backend .NET
+      const productResponse = await axios.put(
         "https://localhost:5003/api/products",
         editingProduct,
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${auth.token}`, // Usar el token del contexto
+            Authorization: `Bearer ${auth.token}`,
           },
         }
       );
-      if (response.status === 200 || response.status === 201) {
-        setMessage("Producto actualizado exitosamente.");
-        setEditingProduct(null);
-        fetchProducts(); // Actualizar la lista después de la edición
+
+      if (productResponse.status !== 200 && productResponse.status !== 201) {
+        throw new Error("El producto no pudo ser actualizado.");
       }
+
+      // Subir la imagen al servidor con el nombre `product_{id}`
+      if (selectedImage) {
+        const formData = new FormData();
+        formData.append("image", selectedImage);
+
+        const uploadResponse = await axios.post(
+          `http://localhost:50005/upload/${editingProduct.id}`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        if (uploadResponse.status !== 200) {
+          throw new Error("La imagen no pudo ser subida correctamente.");
+        }
+      }
+
+      // Mostrar mensaje de éxito y actualizar la lista de productos
+      setMessage("Producto actualizado exitosamente.");
+      setEditingProduct(null);
+      fetchProducts();
     } catch (error) {
-      console.error("Error al actualizar el producto:", error);
-      setMessage("Error al actualizar el producto. Intenta de nuevo.");
+      console.error("Error al actualizar el producto o subir la imagen:", error);
+      setMessage("Hubo un problema: " + error.message);
     }
   };
 
@@ -180,7 +176,7 @@ const ManageProducts = () => {
               Imagen:
               <input
                 type="file"
-                accept="image/png"
+                accept="image/*"
                 onChange={handleImageChange}
               />
             </label>

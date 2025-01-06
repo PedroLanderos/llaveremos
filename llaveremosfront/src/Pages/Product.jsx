@@ -36,9 +36,11 @@ const Product = () => {
   }, [productId]);
 
   const handleAddToCart = () => {
-    const cartItem = cartItems.find((item) => item.id === product.id) || { quantity: 0 };
+    const cartItem = cartItems.find((item) => item.id === product.id) || {
+      cartQuantity: 0,
+    };
 
-    if (cartItem.quantity < product.quantity) {
+    if (cartItem.cartQuantity < product.quantity) {
       addToCart(product);
     } else {
       alert("No hay suficiente stock disponible.");

@@ -14,26 +14,30 @@ const ShopContextProvider = ({ children }) => {
 
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cartItems));
+    console.log("Carrito guardado en LocalStorage:", cartItems);
   }, [cartItems]);
 
   const addToCart = (product) => {
     setCartItems((prevCart) => {
       const existingItem = prevCart.find((item) => item.id === product.id);
-      if (existingItem) {
-        return prevCart.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      }
-      return [...prevCart, { ...product, quantity: 1 }];
+      const newCart = existingItem
+        ? prevCart.map((item) =>
+            item.id === product.id
+              ? { ...item, cartQuantity: item.cartQuantity + 1 }
+              : item
+          )
+        : [...prevCart, { ...product, cartQuantity: 1 }];
+      console.log("Carrito actualizado:", newCart);
+      return newCart;
     });
   };
 
-  const updateCartItemQuantity = (id, quantity) => {
+  const updateCartItemQuantity = (id, cartQuantity) => {
     setCartItems((prevCart) =>
       prevCart.map((item) =>
-        item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
+        item.id === id
+          ? { ...item, cartQuantity: Math.max(1, cartQuantity) }
+          : item
       )
     );
   };

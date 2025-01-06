@@ -12,7 +12,11 @@ export default function Navbar() {
   const { cartItems } = useContext(ShopContext);
   const { auth, logout } = useContext(AuthContext);
 
-  const totalCartItems = cartItems.reduce((total, item) => total + item.quantity, 0);
+  // Calcular el total de ítems en el carrito
+  const totalCartItems = cartItems.reduce(
+    (total, item) => total + (item.cartQuantity || 0),
+    0
+  );
 
   const handleLogout = () => {
     if (window.confirm("¿Cerrar sesión?")) {
@@ -27,16 +31,12 @@ export default function Navbar() {
   return (
     <div className="navbar">
       <div className="nav-logo">
-        <img
-          src={logo}
-          alt="Logo"
-          className="logo-image"
-        />
+        <img src={logo} alt="Logo" className="logo-image" />
         <Link style={{ textDecoration: "none" }} to="/">
           <p>LLAVEREMOS</p>
         </Link>
       </div>
-      
+
       {/* Botón de menú hamburguesa */}
       <div className="menu-toggle" onClick={toggleMenu}>
         <div></div>
@@ -47,7 +47,10 @@ export default function Navbar() {
       <ul className={`nav-menu ${isMenuOpen ? "active" : ""}`}>
         <li
           className={menu === "catalogo" ? "active" : ""}
-          onClick={() => { setMenu("catalogo"); setIsMenuOpen(false); }}
+          onClick={() => {
+            setMenu("catalogo");
+            setIsMenuOpen(false);
+          }}
         >
           <Link style={{ textDecoration: "none" }} to="/">
             Catalogo
@@ -56,7 +59,10 @@ export default function Navbar() {
         </li>
         <li
           className={menu === "an" ? "active" : ""}
-          onClick={() => { setMenu("an"); setIsMenuOpen(false); }}
+          onClick={() => {
+            setMenu("an");
+            setIsMenuOpen(false);
+          }}
         >
           <Link style={{ textDecoration: "none" }} to="/AcercaDeNosotros">
             Acerca de nosotros

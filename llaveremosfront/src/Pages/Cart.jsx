@@ -11,7 +11,10 @@ const Cart = () => {
 
   const calculateTotal = () => {
     return cartItems
-      .reduce((total, item) => total + (item.new_price || 0) * item.quantity, 0)
+      .reduce(
+        (total, item) => total + (item.price || 0) * item.cartQuantity,
+        0
+      )
       .toFixed(2);
   };
 
@@ -21,22 +24,17 @@ const Cart = () => {
       return;
     }
 
-    const clientId = auth.user.id; // ID del cliente correcto
+    const clientId = auth.user.id;
 
     try {
       const responses = await Promise.all(
         cartItems.map(async (item) => {
           const order = {
-            productId: item.id, // ID del producto
-            clientId: clientId, // ID del cliente
-            purchaseQuantity: item.quantity,
-            orderedDate: new Date().toISOString(),
-          };
-
-          console.log("Procesando orden (verificar campos):", {
             productId: item.id,
             clientId: clientId,
-          });
+            purchaseQuantity: item.cartQuantity,
+            orderedDate: new Date().toISOString(),
+          };
 
           // Crear orden
           const orderResponse = await axios.post(
@@ -50,46 +48,6 @@ const Cart = () => {
             }
           );
 
-          console.log("Respuesta de creación de orden:", orderResponse.data);
-
-          // Obtener datos actuales del producto
-          const productResponse = await axios.get(
-            `https://localhost:5003/api/products/${item.id}`
-          );
-          const productData = productResponse.data;
-
-          console.log("Datos del producto antes de actualizar:", productData);
-
-          // Calcular nueva cantidad
-          const updatedQuantity = productData.quantity - item.quantity;
-          if (updatedQuantity < 0) {
-            throw new Error(
-              `Cantidad negativa detectada para el producto ${productData.name}`
-            );
-          }
-
-          // Actualizar el inventario del producto
-          const updateResponse = await axios.put(
-            "https://localhost:5003/api/products",
-            {
-              id: productData.id,
-              name: productData.name,
-              quantity: updatedQuantity,
-              price: productData.price,
-            },
-            {
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${auth.token}`,
-              },
-            }
-          );
-
-          console.log(
-            "Respuesta de actualización de inventario:",
-            updateResponse.data
-          );
-
           return orderResponse;
         })
       );
@@ -101,8 +59,29 @@ const Cart = () => {
         alert("Algunas compras no se completaron correctamente.");
       }
     } catch (error) {
-      console.error("Error al realizar la compra:", error.response?.data || error.message);
+      console.error(
+        "Error al realizar la compra:",
+        error.response?.data || error.message
+      );
       alert("Ocurrió un error al procesar la compra. Inténtalo de nuevo.");
+    }
+  };
+
+  const handleIncreaseQuantity = async (item) => {
+    try {
+      const response = await axios.get(
+        `https://localhost:5003/api/products/${item.id}`
+      );
+      const productData = response.data;
+
+      if (item.cartQuantity < productData.quantity) {
+        updateCartItemQuantity(item.id, item.cartQuantity + 1);
+      } else {
+        alert(`Solo hay ${productData.quantity} unidades disponibles.`);
+      }
+    } catch (error) {
+      console.error("Error al validar stock:", error);
+      alert("Error al validar stock. Inténtalo más tarde.");
     }
   };
 
@@ -122,39 +101,19 @@ const Cart = () => {
               />
               <div className="cart-item-info">
                 <h2>{item.name || "Producto desconocido"}</h2>
-                <p>Precio: ${item.new_price?.toFixed(2) || "0.00"}</p>
+                <p>Precio unitario: ${item.price?.toFixed(2) || "0.00"}</p>
                 <div className="cart-item-controls">
                   <button
                     onClick={() =>
-                      item.quantity > 1
-                        ? updateCartItemQuantity(item.id, item.quantity - 1)
+                      item.cartQuantity > 1
+                        ? updateCartItemQuantity(item.id, item.cartQuantity - 1)
                         : removeItemFromCart(item.id)
                     }
                   >
                     -
                   </button>
-                  <span>{item.quantity}</span>
-                  <button
-                    onClick={async () => {
-                      try {
-                        const response = await axios.get(
-                          `https://localhost:5003/api/products/${item.id}`
-                        );
-                        const product = response.data;
-
-                        if (item.quantity < product.quantity) {
-                          updateCartItemQuantity(item.id, item.quantity + 1);
-                        } else {
-                          alert("No hay suficiente stock disponible.");
-                        }
-                      } catch (error) {
-                        console.error("Error al validar stock:", error);
-                        alert("Error al validar stock. Inténtalo más tarde.");
-                      }
-                    }}
-                  >
-                    +
-                  </button>
+                  <span>{item.cartQuantity}</span>
+                  <button onClick={() => handleIncreaseQuantity(item)}>+</button>
                 </div>
                 <button
                   onClick={() => removeItemFromCart(item.id)}
