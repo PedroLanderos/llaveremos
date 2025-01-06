@@ -17,6 +17,7 @@
     gap: 20px;
     margin: auto;
     max-width: 800px;
+    width: 100%;
 }
 
 .empty-cart {
@@ -27,11 +28,13 @@
 
 .cart-item {
     display: flex;
+    flex-wrap: wrap; /* Permite que los elementos se ajusten si no caben */
     align-items: center;
     background: white;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    gap: 15px;
 }
 
 .cart-item-image {
@@ -39,7 +42,7 @@
     height: 100px;
     object-fit: cover;
     border-radius: 10px;
-    margin-right: 20px;
+    flex-shrink: 0; /* Evita que se reduzca el tamaño de la imagen */
 }
 
 .cart-item-info {
@@ -47,16 +50,22 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    min-width: 200px; /* Asegura un ancho mínimo para que los textos no se rompan */
 }
 
 .cart-item-info h2 {
     font-size: 20px;
     color: #171717;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Trunca texto si es demasiado largo */
 }
 
 .cart-item-info p {
     font-size: 18px;
     color: #555;
+    margin: 0;
 }
 
 .cart-item-controls {
@@ -83,8 +92,6 @@
 }
 
 .remove-item {
-    align-self: flex-start;
-    margin-top: 10px;
     background: none;
     color: #ff4141;
     font-size: 16px;
@@ -111,4 +118,63 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .cart-item-image {
+        width: 80px;
+        height: 80px;
+    }
+
+    .cart-item-info {
+        width: 100%; /* Asegura que ocupe todo el ancho disponible */
+    }
+
+    .cart-item-controls {
+        justify-content: space-between;
+        width: 100%; /* Los controles se distribuyen mejor */
+    }
+
+    .cart-summary h2 {
+        font-size: 24px;
+    }
+
+    .checkout-button {
+        width: 100%; /* Botón a ancho completo en pantallas pequeñas */
+    }
+}
+
+@media (max-width: 480px) {
+    .cart-container {
+        padding: 10px;
+    }
+
+    .cart-item {
+        padding: 15px;
+        gap: 10px;
+    }
+
+    .cart-item-info h2 {
+        font-size: 16px;
+    }
+
+    .cart-item-info p {
+        font-size: 14px;
+    }
+
+    .cart-item-controls button {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .checkout-button {
+        font-size: 16px;
+    }
 }

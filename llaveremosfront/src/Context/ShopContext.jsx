@@ -5,22 +5,13 @@ export const ShopContext = createContext();
 const ShopContextProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
 
-  // Cargar carrito desde localStorage al inicio
   useEffect(() => {
     const storedCart = localStorage.getItem("cart");
     if (storedCart) {
-      const parsedCart = JSON.parse(storedCart).map((item) => ({
-        ...item,
-        new_price: item.new_price || 0,
-        quantity: item.quantity || 1,
-        name: item.name || "Producto desconocido",
-        image: item.image || "https://via.placeholder.com/120",
-      }));
-      setCartItems(parsedCart);
+      setCartItems(JSON.parse(storedCart));
     }
   }, []);
 
-  // Guardar carrito en localStorage cada vez que cambie
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cartItems));
   }, [cartItems]);

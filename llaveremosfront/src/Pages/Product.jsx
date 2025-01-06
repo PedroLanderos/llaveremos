@@ -4,7 +4,6 @@ import axios from "axios";
 import "./CSS/Product.css";
 import { ShopContext } from "../Context/ShopContext";
 
-// Función para cargar imágenes dinámicamente
 const importAll = (r) => {
   let images = {};
   r.keys().forEach((key) => {
@@ -16,14 +15,13 @@ const importAll = (r) => {
   return images;
 };
 
-// Importa todas las imágenes desde la carpeta ../Components/Assets/Images
 const images = importAll(
   require.context("../Components/Assets/Images", false, /\.png$/)
 );
 
 const Product = () => {
   const { productId } = useParams();
-  const { addToCart } = useContext(ShopContext);
+  const { addToCart, cartItems } = useContext(ShopContext);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -36,7 +34,6 @@ const Product = () => {
         );
         const data = response.data;
 
-        // Asociar imagen al producto
         const productWithImage = {
           ...data,
           image: images[data.id] || null,
@@ -55,6 +52,16 @@ const Product = () => {
 
     fetchProduct();
   }, [productId]);
+
+  const handleAddToCart = () => {
+    const cartItem = cartItems.find((item) => item.id === product.id) || { quantity: 0 };
+
+    if (cartItem.quantity < product.quantity) {
+      addToCart(product);
+    } else {
+      alert("No hay suficiente stock disponible.");
+    }
+  };
 
   if (loading) {
     return <p style={{ textAlign: "center" }}>Cargando detalles del producto...</p>;
@@ -84,7 +91,7 @@ const Product = () => {
           {product.old_price && <span className="old-price">${product.old_price}</span>}
           <span className="new-price">${product.new_price}</span>
         </div>
-        <button className="add-to-cart" onClick={() => addToCart(product)}>
+        <button className="add-to-cart" onClick={handleAddToCart}>
           Agregar al carrito
         </button>
       </div>

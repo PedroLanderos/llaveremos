@@ -1,96 +1,206 @@
-.navbar{
-    display: flex;
-    justify-content: space-around;
-    padding: 16px;
-    box-shadow: 0 1px 3px -2px black;
+/* Aplicar box-sizing global */
+*, *::before, *::after {
+    box-sizing: border-box;
 }
 
-.nav-logo{
+/* Estilo principal de la navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem; /* 16px */
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 1000;
+}
+
+/* Contenedor del logo */
+.nav-logo {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 0.625rem; /* 10px */
 }
 
-.nav-logo p{
+.nav-logo img {
+    width: 4rem; /* 64px */
+    height: 4rem; /* 64px */
+    border-radius: 10%;
+    object-fit: cover;
+}
+
+.nav-logo p {
     color: #171717;
-    font-size: 38px;
+    font-size: 2.375rem; /* 38px */
     font-weight: 600;
+    margin: 0;
 }
 
-.nav-menu{
+/* Menú de navegación */
+.nav-menu {
     display: flex;
     align-items: center;
     list-style: none;
-    gap:50px;
+    gap: 3.125rem; /* 50px */
     color: #626262;
-    font-size: 20px;
+    font-size: 1.25rem; /* 20px */
     font-weight: 500;
 }
 
-.nav-menu li{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
+.nav-menu li {
+    position: relative;
     cursor: pointer;
 }
 
-.nav-menu hr{
+.nav-menu li a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.nav-menu li hr {
+    position: absolute;
+    bottom: -0.5rem;
+    left: 10%;
     border: none;
     width: 80%;
-    height: 3px;
-    border-radius: 10px;
+    height: 0.1875rem; /* 3px */
+    border-radius: 0.625rem; /* 10px */
     background: #FF4141;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
-.nav-login-cart{
+.nav-menu li.active hr,
+.nav-menu li:hover hr {
+    opacity: 1;
+}
+
+/* Contenedor de botones de login y carrito */
+.nav-login-cart {
     display: flex;
     align-items: center;
-    gap: 45px;
+    gap: 2.8125rem; /* 45px */
 }
 
-.nav-login-cart button{
-    width: 157px;
-    height: 58px;
-    outline: none;
+/* Botón de iniciar sesión */
+.nav-login-cart button {
+    padding: 0.75rem 1.25rem; /* 12px 20px */
     border: 1px solid #7a7a7a;
-    border-radius: 75px;
+    border-radius: 3.75rem; /* 60px */
     color: #515151;
-    font-size: 20px;
+    font-size: 1.25rem; /* 20px */
     font-weight: 500;
     background: white;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-.nav-login-cart button:active{
+.nav-login-cart button:hover {
     background: #f3f3f3;
 }
 
-.nav-cart-count{
-    width: 22px;
-    height: 22px;
+/* Contador de ítems en el carrito */
+.nav-cart-count {
+    position: absolute;
+    top: 0.5rem; /* 8px */
+    right: 1.25rem; /* 20px */
+    width: 1.375rem; /* 22px */
+    height: 1.375rem; /* 22px */
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: -35px;
-    margin-left: -55px;
-    border-radius: 11px;
-    font-size: 14px;
+    border-radius: 50%;
+    font-size: 0.875rem; /* 14px */
     background: red;
     color: white;
+    pointer-events: none;
 }
+
+/* Icono de usuario */
 .nav-user .user-icon {
-    width: 40px;
-    height: 40px;
+    width: 2.5rem; /* 40px */
+    height: 2.5rem; /* 40px */
     background-color: #515151;
     color: white;
-    font-size: 20px;
+    font-size: 1.25rem; /* 20px */
     font-weight: bold;
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: 50%;
     cursor: pointer;
-  }
-  
+    position: relative;
+}
+
+/* Imagen del carrito */
+.nav-login-cart img {
+    width: 2.5rem; /* 40px */
+    height: 2.5rem; /* 40px */
+    cursor: pointer;
+}
+
+/* Media Queries para Responsividad */
+
+/* Tablet */
+@media (max-width: 1024px) {
+    .nav-menu {
+        gap: 2.5rem; /* 40px */
+        font-size: 1.125rem; /* 18px */
+    }
+
+    .nav-login-cart {
+        gap: 2.5rem; /* 40px */
+    }
+}
+
+/* Dispositivos Móviles */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .nav-menu {
+        flex-direction: column;
+        gap: 1.875rem; /* 30px */
+        width: 100%;
+        display: none; /* Ocultar el menú por defecto */
+        margin-top: 1rem;
+    }
+
+    .nav-menu.active {
+        display: flex;
+    }
+
+    .nav-login-cart {
+        gap: 1.875rem; /* 30px */
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 1rem;
+    }
+
+    .nav-menu li hr {
+        bottom: -0.25rem;
+    }
+
+    /* Botón de menú (hamburguesa) */
+    .menu-toggle {
+        display: block;
+        cursor: pointer;
+    }
+
+    .menu-toggle div {
+        width: 25px;
+        height: 3px;
+        background-color: #171717;
+        margin: 5px 0;
+        transition: 0.4s;
+    }
+}
+
+/* Ocultar el botón de menú en pantallas grandes */
+@media (min-width: 769px) {
+    .menu-toggle {
+        display: none;
+    }
+}

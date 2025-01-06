@@ -8,11 +8,9 @@ const Hero = () => {
   return (
     <div className='hero'>
       <div className="hero-left">
-        <h2>LLaveros</h2>
         <div>
           <div className="hero-hand-icon">
             <p>Nuevos</p>
-            <img src={handIcon} alt="" />
           </div>
           <p>Diseños</p>
           <p>De los mejores llaveros</p>

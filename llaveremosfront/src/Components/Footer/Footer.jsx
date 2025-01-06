@@ -12,13 +12,6 @@ const Footer = () => {
         <img src={footer_logo} alt="" />
         <p>Llaveremos</p>
       </div>
-      <ul className="footer-links">
-        <li>a</li>
-        <li>b</li>
-        <li>c</li>
-        <li>d</li>
-        <li>e</li>
-      </ul>
       <div className="footer-social-icon">
         <div className="footer-icons-container">
           <a href="https://www.instagram.com/_alexito_gm_/" target="_blank" rel="noopener noreferrer">

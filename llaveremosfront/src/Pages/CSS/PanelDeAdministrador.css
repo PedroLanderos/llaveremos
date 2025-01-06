@@ -5,6 +5,7 @@
     font-family: 'Arial', sans-serif;
 }
 
+/* Sidebar */
 .sidebar {
     width: 300px;
     background-color: #1f1f1f;
@@ -99,6 +100,7 @@
     }
 }
 
+/* Content */
 .content {
     flex-grow: 1;
     padding: 40px;
@@ -130,4 +132,72 @@
     font-weight: bold;
     text-transform: uppercase;
     color: #fff;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 200px;
+        padding: 15px;
+    }
+
+    .sidebar h1 {
+        font-size: 20px;
+    }
+
+    .sidebar ul li {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .submenu li {
+        padding: 8px 15px;
+        font-size: 12px;
+    }
+
+    .content {
+        padding: 20px;
+    }
+
+    .content h2 {
+        font-size: 24px;
+    }
+
+    .content p {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar {
+        width: 100px;
+        padding: 10px;
+    }
+
+    .sidebar h1 {
+        font-size: 16px;
+        text-align: center;
+    }
+
+    .sidebar ul li {
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    .submenu li {
+        padding: 6px 10px;
+        font-size: 10px;
+    }
+
+    .content {
+        padding: 10px;
+    }
+
+    .content h2 {
+        font-size: 20px;
+    }
+
+    .content p {
+        font-size: 14px;
+    }
 }

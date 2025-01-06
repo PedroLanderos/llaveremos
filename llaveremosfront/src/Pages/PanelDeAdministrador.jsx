@@ -1,136 +1,57 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Para redirigir si no es admin
 import './CSS/PanelDeAdministrador.css';
+import CreateProduct from './CreateProduct';
+import AddUser  from './AddUser';
+import ManageProducts from './ManageProducts';
+import ManageUsers from './ManageUsers';
+import { AuthContext } from '../Context/AuthContext'; // Contexto de autenticación
+import ManageOrders from './ManageOrders';
 
 const PanelDeAdministrador = () => {
   const [activeTab, setActiveTab] = useState('');
   const [activeSubmenu, setActiveSubmenu] = useState('');
-  const [product, setProduct] = useState({
-    name: '',
-    price: '',
-    quantity: '',
-  });
-  const [image, setImage] = useState(null);
-  const [message, setMessage] = useState('');
+  const { auth } = useContext(AuthContext); // Obtener la información del usuario autenticado
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true); // Estado para controlar la carga
+
+  useEffect(() => {
+    // Verifica si el rol está disponible
+    if (auth?.user?.role) {
+      if (auth.user.role !== 'Admin') {
+        alert('No tienes permiso para acceder a este panel.');
+        navigate('/'); // Redirigir si no es Admin
+      }
+      setLoading(false); // Deja de cargar si el rol está definido
+    }
+  }, [auth, navigate]);
+
+  // Mientras se verifica el rol, muestra un mensaje de carga
+  if (loading) {
+    return <div>Cargando...</div>;
+  }
+
+  // Si el usuario no es Admin (capa de protección adicional)
+  if (auth?.user?.role !== 'Admin') {
+    return null;
+  }
 
   const toggleSubmenu = (menu) => {
     setActiveSubmenu((prev) => (prev === menu ? '' : menu));
   };
 
-  const handleProductChange = (e) => {
-    const { name, value } = e.target;
-    setProduct((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
-  };
-
-  const handleProductSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      // Enviar datos del producto al backend
-      const response = await axios.post('https://localhost:5003/api/products', product);
-      if (response.status === 201 || response.status === 200) {
-        const productId = response.data.id; // Obtén el ID del producto
-
-        // Guardar la imagen localmente en el frontend
-        if (image) {
-          const formData = new FormData();
-          formData.append('file', image);
-          formData.append('productId', productId);
-
-          // Guardar la imagen localmente en el frontend
-          const saveImageResponse = await fetch('/save-image', {
-            method: 'POST',
-            body: formData,
-          });
-
-          if (saveImageResponse.ok) {
-            setMessage('Producto e imagen agregados exitosamente.');
-          } else {
-            setMessage('Producto agregado, pero hubo un error al subir la imagen.');
-          }
-        } else {
-          setMessage('Producto agregado exitosamente.');
-        }
-
-        // Resetear formulario
-        setProduct({
-          name: '',
-          price: '',
-          quantity: '',
-        });
-        setImage(null);
-      }
-    } catch (error) {
-      console.error(error);
-      setMessage('Error al agregar el producto. Inténtalo de nuevo.');
-    }
-  };
-
   const renderContent = () => {
     switch (activeTab) {
       case 'agregarUsuario':
-        return <div>Agregar Usuario</div>;
+        return <AddUser />;
       case 'administrarUsuarios':
-        return <div>Administrar Usuarios</div>;
+        return <ManageUsers/>
       case 'agregarProducto':
-        return (
-          <div className="loginsingup">
-            <div className="loginSingup-container">
-              <h1>Agregar Producto</h1>
-              <form onSubmit={handleProductSubmit}>
-                <div className="loginsignup-fields">
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="Nombre del producto"
-                    value={product.name}
-                    onChange={handleProductChange}
-                    required
-                  />
-                  <input
-                    type="number"
-                    name="price"
-                    placeholder="Precio"
-                    value={product.price}
-                    onChange={handleProductChange}
-                    required
-                  />
-                  <input
-                    type="number"
-                    name="quantity"
-                    placeholder="Cantidad"
-                    value={product.quantity}
-                    onChange={handleProductChange}
-                    required
-                  />
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    required
-                  />
-                </div>
-                <button type="submit">Agregar Producto</button>
-              </form>
-              {message && (
-                <p style={{ marginTop: '20px', color: message.includes('exitosamente') ? 'green' : 'red' }}>
-                  {message}
-                </p>
-              )}
-            </div>
-          </div>
-        );
+        return <CreateProduct />;
       case 'administrarProductos':
-        return <Productos />;
+        return <ManageProducts />;
       case 'administrarCompras':
-        return <Compras />;
+        return <ManageOrders />;
       default:
         return <div>Selecciona una sección del panel.</div>;
     }
@@ -141,25 +62,42 @@ const PanelDeAdministrador = () => {
       <div className="sidebar">
         <h1>Panel de Administrador</h1>
         <ul>
-          <li onClick={() => toggleSubmenu('productos')} className={activeSubmenu === 'productos' ? 'active' : ''}>
+          <li
+            onClick={() => toggleSubmenu('productos')}
+            className={activeSubmenu === 'productos' ? 'active' : ''}
+          >
             Productos
             {activeSubmenu === 'productos' && (
               <ul className="submenu">
-                <li onClick={() => setActiveTab('agregarProducto')}>Agregar Producto</li>
-                <li onClick={() => setActiveTab('administrarProductos')}>Administrar Productos</li>
+                <li onClick={() => setActiveTab('agregarProducto')}>
+                  Agregar Producto
+                </li>
+                <li onClick={() => setActiveTab('administrarProductos')}>
+                  Administrar Productos
+                </li>
               </ul>
             )}
           </li>
-          <li onClick={() => toggleSubmenu('usuarios')} className={activeSubmenu === 'usuarios' ? 'active' : ''}>
+          <li
+            onClick={() => toggleSubmenu('usuarios')}
+            className={activeSubmenu === 'usuarios' ? 'active' : ''}
+          >
             Usuarios
             {activeSubmenu === 'usuarios' && (
               <ul className="submenu">
-                <li onClick={() => setActiveTab('agregarUsuario')}>Agregar Usuario</li>
-                <li onClick={() => setActiveTab('administrarUsuarios')}>Administrar Usuarios</li>
+                <li onClick={() => setActiveTab('agregarUsuario')}>
+                  Agregar Usuario
+                </li>
+                <li onClick={() => setActiveTab('administrarUsuarios')}>
+                  Administrar Usuarios
+                </li>
               </ul>
             )}
           </li>
-          <li onClick={() => setActiveTab('administrarCompras')} className={activeTab === 'administrarCompras' ? 'active' : ''}>
+          <li
+            onClick={() => setActiveTab('administrarCompras')}
+            className={activeTab === 'administrarCompras' ? 'active' : ''}
+          >
             Compras
           </li>
         </ul>

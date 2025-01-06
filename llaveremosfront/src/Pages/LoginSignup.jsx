@@ -60,7 +60,7 @@ const LoginSignup = () => {
   };
 
   return (
-    <div className="loginsingup">
+    <div className="loginSignup">
       <div className="loginSignup-container">
         <h1>{isRegister ? "Registro" : "Iniciar Sesión"}</h1>
         {message && (
