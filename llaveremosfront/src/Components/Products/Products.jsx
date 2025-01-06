@@ -2,21 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./Products.css";
 import axios from "axios";
 import Items from "../Items/Items";
-
-// Función para cargar imágenes dinámicamente
-const importAll = (r) => {
-  let images = {};
-  r.keys().forEach((key) => {
-    const id = key.match(/product_(\d+)\.png$/)?.[1];
-    if (id) {
-      images[id] = r(key);
-    }
-  });
-  return images;
-};
-
-// Importa todas las imágenes desde la carpeta Assets/Images
-const images = importAll(require.context("../Assets/Images", false, /\.png$/));
+import { Link } from "react-router-dom"; // Importar Link
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -30,12 +16,9 @@ const Products = () => {
         );
         const data = response.data;
 
-        // Asociar imágenes a los productos
         const productsWithImages = data.map((product) => ({
           ...product,
-          image: images[product.id] || null, // Asignar imagen según ID
-          new_price: product.price, // Precio actual de la API
-          old_price: null, // Asignar null si no hay precio antiguo
+          image: `http://localhost:50005/uploads/product_${product.id}.png`,
         }));
 
         setProducts(productsWithImages);
@@ -56,14 +39,19 @@ const Products = () => {
       <div className="collections">
         {products.length > 0 ? (
           products.map((item) => (
-            <Items
-              key={item.id}
-              id={item.id}
-              name={item.name}
-              image={item.image}
-              new_price={item.new_price}
-              old_price={item.old_price}
-            />
+            <div key={item.id} className="item-container">
+              {/* Link envuelve la imagen y el componente Items */}
+              <Link to={`/product/${item.id}`} className="product-link">
+                <div className="item-image">
+                  <img src={item.image} alt={item.name} />
+                </div>
+                <Items
+                  id={item.id}
+                  name={item.name}
+                  new_price={item.price}
+                />
+              </Link>
+            </div>
           ))
         ) : (
           <p style={{ textAlign: "center" }}>Cargando productos...</p>

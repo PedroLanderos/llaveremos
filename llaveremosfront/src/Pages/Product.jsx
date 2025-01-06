@@ -4,21 +4,6 @@ import axios from "axios";
 import "./CSS/Product.css";
 import { ShopContext } from "../Context/ShopContext";
 
-const importAll = (r) => {
-  let images = {};
-  r.keys().forEach((key) => {
-    const id = key.match(/product_(\d+)\.png$/)?.[1];
-    if (id) {
-      images[id] = r(key);
-    }
-  });
-  return images;
-};
-
-const images = importAll(
-  require.context("../Components/Assets/Images", false, /\.png$/)
-);
-
 const Product = () => {
   const { productId } = useParams();
   const { addToCart, cartItems } = useContext(ShopContext);
@@ -36,10 +21,7 @@ const Product = () => {
 
         const productWithImage = {
           ...data,
-          image: images[data.id] || null,
-          new_price: data.price,
-          old_price: null,
-          description: data.description || "Descripción no disponible.",
+          image: `http://localhost:50005/uploads/product_${data.id}.png`,
         };
 
         setProduct(productWithImage);
@@ -88,8 +70,7 @@ const Product = () => {
         <h1>{product.name}</h1>
         <p className="product-description">{product.description}</p>
         <div className="product-prices">
-          {product.old_price && <span className="old-price">${product.old_price}</span>}
-          <span className="new-price">${product.new_price}</span>
+          <span className="new-price">${product.price}</span>
         </div>
         <button className="add-to-cart" onClick={handleAddToCart}>
           Agregar al carrito

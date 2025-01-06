@@ -1,15 +1,16 @@
-import React, { useState, useContext } from 'react';
-import axios from 'axios';
-import './CSS/CreateProduct.css';
-import { AuthContext } from '../Context/AuthContext';
+import React, { useState, useContext } from "react";
+import axios from "axios";
+import "./CSS/CreateProduct.css";
+import { AuthContext } from "../Context/AuthContext";
 
 const CreateProduct = () => {
   const [product, setProduct] = useState({
-    name: '',
-    price: '',
-    quantity: '',
+    name: "",
+    price: "",
+    quantity: "",
   });
-  const [message, setMessage] = useState('');
+  const [image, setImage] = useState(null);
+  const [message, setMessage] = useState("");
   const { auth } = useContext(AuthContext);
 
   const handleInputChange = (e) => {
@@ -20,29 +21,70 @@ const CreateProduct = () => {
     }));
   };
 
+  const handleImageChange = (e) => {
+    setImage(e.target.files[0]); // Guardar la imagen seleccionada
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const response = await axios.post('https://localhost:5003/api/products', product, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${auth.token}`,
-        },
-      });
 
-      if (response.status === 201 || response.status === 200) {
-        setMessage('Producto creado exitosamente.');
-        setProduct({
-          name: '',
-          price: '',
-          quantity: '',
-        });
-      } else {
-        setMessage('Error al crear el producto.');
+    try {
+      // Crear el producto en el backend .NET
+      const productResponse = await axios.post(
+        "https://localhost:5003/api/products",
+        product,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${auth.token}`, // Requiere autorización
+          },
+        }
+      );
+
+      if (productResponse.status !== 200 && productResponse.status !== 201) {
+        throw new Error("El producto no pudo ser creado.");
       }
+
+      // Obtener el ID del último producto creado
+      const productsResponse = await axios.get("https://localhost:5003/api/products"); // No necesita autorización
+      const products = productsResponse.data;
+
+      // Encontrar el producto con el ID más alto
+      const lastProduct = products.reduce((max, product) =>
+        product.id > max.id ? product : max
+      );
+
+      // Subir la imagen al servidor con el nombre `product_{id}`
+      if (image) {
+        const formData = new FormData();
+        formData.append("image", image);
+
+        const uploadResponse = await axios.post(
+          `http://localhost:50005/upload/${lastProduct.id}`, // Usar el ID del último producto
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        if (uploadResponse.status !== 200) {
+          throw new Error("La imagen no pudo ser subida correctamente.");
+        }
+      }
+
+      // Mostrar mensaje de éxito y reiniciar el formulario
+      setMessage("Producto creado exitosamente.");
+      setProduct({
+        name: "",
+        price: "",
+        quantity: "",
+      });
+      setImage(null);
     } catch (error) {
-      console.error('Error:', error);
-      setMessage('Hubo un problema al crear el producto.');
+      console.error("Error al crear el producto o subir la imagen:", error);
+      setMessage("Hubo un problema: " + error.message);
     }
   };
 
@@ -75,12 +117,18 @@ const CreateProduct = () => {
             onChange={handleInputChange}
             required
           />
+          <input
+            type="file"
+            name="image"
+            accept="image/*"
+            onChange={handleImageChange}
+          />
           <button type="submit">Crear Producto</button>
         </form>
         {message && (
           <p
             className={`message ${
-              message.includes('exitosamente') ? 'success' : 'error'
+              message.includes("exitosamente") ? "success" : "error"
             }`}
           >
             {message}
